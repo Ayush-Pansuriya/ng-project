@@ -1,0 +1,159 @@
+<div class="checkout-container">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Checkout Content -->
+  <div class="checkout-content" *ngIf="!isLoading">
+    <h1 class="checkout-title">Checkout</h1>
+
+    <!-- Order Summary -->
+    <div class="order-summary-card">
+      <h2 class="summary-title">Order Summary</h2>
+      <div class="summary-items" *ngIf="cartItems.length > 0">
+        <div class="summary-item" *ngFor="let item of cartItems">
+          <span class="item-name">{{ item.product.name }} (x{{ item.quantity }})</span>
+          <span class="item-price">{{ item.product.price * item.quantity | currency }}</span>
+        </div>
+      </div>
+      <div class="summary-total" *ngIf="cartItems.length > 0">
+        <span class="total-label">Total Amount:</span>
+        <span class="total-price">{{ getTotal() | currency }}</span>
+      </div>
+      <div class="empty-cart" *ngIf="cartItems.length === 0">
+        <p>Your cart is empty. <a (click)="navigatetohome()">Continue Shopping</a></p>
+      </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" class="checkout-form-card">
+      <h2 class="form-title">Payment Details</h2>
+
+      <div class="form-group">
+        <label for="shippingAddress">Shipping Address</label>
+        <textarea
+          id="shippingAddress"
+          formControlName="shippingAddress"
+          rows="4"
+          placeholder="Enter your shipping address"
+          class="form-control"
+        ></textarea>
+        <div class="error" *ngIf="checkoutForm.get('shippingAddress')?.touched && checkoutForm.get('shippingAddress')?.invalid">
+          Shipping address is required.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="paymentMethod">Payment Method</label>
+        <select
+          id="paymentMethod"
+          formControlName="paymentMethod"
+          (change)="onPaymentMethodChange()"
+          class="form-control"
+        >
+          <option value="">Select a payment method</option>
+          <option value="credit-card">Credit Card</option>
+          <option value="bank-transfer">Bank Transfer</option>
+          <option value="paypal">PayPal</option>
+        </select>
+        <div class="error" *ngIf="checkoutForm.get('paymentMethod')?.touched && checkoutForm.get('paymentMethod')?.invalid">
+          Payment method is required.
+        </div>
+      </div>
+
+      <!-- Credit Card Details -->
+      <div class="payment-details" *ngIf="checkoutForm.get('paymentMethod')?.value === 'credit-card'">
+        <div class="form-group">
+          <label for="cardNumber">Card Number</label>
+          <input
+            id="cardNumber"
+            formControlName="cardNumber"
+            type="text"
+            placeholder="Enter 16-digit card number"
+            class="form-control"
+          />
+          <div class="error" *ngIf="checkoutForm.get('cardNumber')?.touched && checkoutForm.get('cardNumber')?.invalid">
+            Valid 16-digit card number is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="expiryDate">Expiry Date (MM/YY)</label>
+          <input
+            id="expiryDate"
+            formControlName="expiryDate"
+            type="text"
+            placeholder="MM/YY"
+            class="form-control"
+          />
+          <div class="error" *ngIf="checkoutForm.get('expiryDate')?.touched && checkoutForm.get('expiryDate')?.invalid">
+            Valid expiry date (MM/YY) is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input id="cvv" formControlName="cvv" type="text" placeholder="Enter CVV" class="form-control" />
+          <div class="error" *ngIf="checkoutForm.get('cvv')?.touched && checkoutForm.get('cvv')?.invalid">
+            Valid 3-4 digit CVV is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Transfer Details -->
+      <div class="payment-details" *ngIf="checkoutForm.get('paymentMethod')?.value === 'bank-transfer'">
+        <div class="form-group">
+          <label for="accountNumber">Account Number</label>
+          <input
+            id="accountNumber"
+            formControlName="accountNumber"
+            type="text"
+            placeholder="Enter account number"
+            class="form-control"
+          />
+          <div class="error" *ngIf="checkoutForm.get('accountNumber')?.touched && checkoutForm.get('accountNumber')?.invalid">
+            Valid account number (8-17 digits) is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="routingNumber">Routing Number</label>
+          <input
+            id="routingNumber"
+            formControlName="routingNumber"
+            type="text"
+            placeholder="Enter routing number"
+            class="form-control"
+          />
+          <div class="error" *ngIf="checkoutForm.get('routingNumber')?.touched && checkoutForm.get('routingNumber')?.invalid">
+            Valid 9-digit routing number is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- PayPal Details -->
+      <div class="payment-details" *ngIf="checkoutForm.get('paymentMethod')?.value === 'paypal'">
+        <div class="form-group">
+          <label for="paypalEmail">PayPal Email</label>
+          <input
+            id="paypalEmail"
+            formControlName="paypalEmail"
+            type="email"
+            placeholder="Enter PayPal email"
+            class="form-control"
+          />
+          <div class="error" *ngIf="checkoutForm.get('paypalEmail')?.touched && checkoutForm.get('paypalEmail')?.invalid">
+            Valid email is required.
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn checkout-btn" [disabled]="checkoutForm.invalid">
+        Place Order
+      </button>
+    </form>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="successMessage" [@fadeInOut]>
+      {{ successMessage }}
+    </div>
+  </div>
+</div>

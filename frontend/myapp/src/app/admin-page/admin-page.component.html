@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Admin Dashboard</title>
+  <style>
+    /* Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    
+    /* Layout */
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar */
+    .admin-sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #2c3e50, #1a252f);
+      color: white;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .admin-sidebar h2 {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    
+    .admin-sidebar button {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.5rem;
+      text-align: left;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    
+    .admin-sidebar button::before {
+      content: "•";
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+    
+    .admin-sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(5px);
+    }
+    
+    .admin-sidebar button.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: 600;
+    }
+    
+    .admin-sidebar button:last-child {
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1rem;
+      color: #ff7675;
+    }
+    
+    /* Main Content */
+    .admin-content {
+      flex: 1;
+      padding: 2rem;
+      margin-left: 280px;
+    }
+    
+    .admin-title {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    
+    .admin-info {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+    
+    /* Error Message */
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #c62828;
+    }
+    
+    /* Orders List */
+    .orders-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .order-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .order-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .order-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .status {
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-pending {
+      background-color: #fff8e1;
+      color: #f57c00;
+    }
+    
+    .status-processing {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .status-shipped {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .status-delivered {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .status-cancelled {
+      background-color: #fce4ec;
+      color: #c2185b;
+    }
+    
+    .order-details {
+      padding: 1.2rem;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .order-details p {
+      margin-bottom: 0.6rem;
+      color: #546e7a;
+      font-size: 0.95rem;
+    }
+    
+    .order-details strong {
+      color: #37474f;
+    }
+    
+    .order-items {
+      padding: 1.2rem;
+    }
+    
+    .order-items h3 {
+      font-size: 1rem;
+      color: #2c3e50;
+      margin-bottom: 0.8rem;
+    }
+    
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px dashed #eaeaea;
+      font-size: 0.9rem;
+    }
+    
+    .item:last-child {
+      border-bottom: none;
+    }
+    
+    .order-actions {
+      padding: 1.2rem;
+      background-color: #f8f9fa;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .order-actions label {
+      font-size: 0.9rem;
+      color: #546e7a;
+      margin-right: 0.5rem;
+    }
+    
+    .order-actions select {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+      font-size: 0.9rem;
+      color: #37474f;
+      cursor: pointer;
+    }
+    
+    /* No Orders */
+    .no-orders {
+      background-color: white;
+      border-radius: 10px;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .no-orders h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    
+    .no-orders p {
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+    
+    .cta-button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .cta-button:hover {
+      background-color: #2980b9;
+    }
+    
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .admin-sidebar {
+        width: 240px;
+      }
+      
+      .admin-content {
+        margin-left: 240px;
+      }
+      
+      .orders-list {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .admin-container {
+        flex-direction: column;
+      }
+      
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+      }
+      
+      .admin-sidebar h2 {
+        margin-bottom: 1rem;
+      }
+      
+      .admin-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="loading-overlay" *ngIf="isLoading">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="admin-sidebar">
+      <h2>Admin Panel</h2>
+      <button routerLink="/addadmin">Add Admin</button>
+      <button class="active" (click)="navigateTo('orders')">View Orders</button>
+      <button (click)="navigateTo('adminuserdashbord')">User Informations</button>
+      <button (click)="navigateTo('adminproduct')">Manage Products</button>
+      <button (click)="navigateTo('analytics')">View Analytics</button>
+      <button (click)="navigateTo('settings')">Site Settings</button>
+      <button (click)="logout()">Logout</button>
+    </div>
+
+    <div class="admin-content" *ngIf="!isLoading">
+      <h1 class="admin-title">Admin Dashboard - Orders</h1>
+      <p class="admin-info">Logged in as: {{ userEmail || 'Unknown' }}</p>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Orders List -->
+      <div class="orders-list" *ngIf="orders.length > 0">
+        <div class="order-card" *ngFor="let order of orders">
+          <div class="order-header">
+            <h2>Order ID: {{ order._id }}</h2>
+            <span class="status status-{{ order.status }}">{{ order.status }}</span>
+          </div>
+
+          <div class="order-details">
+            <p><strong>User:</strong> {{ order.userId?.username || 'Unknown' }}</p>
+            <p><strong>User Email:</strong> {{ order.userId?.email || 'Not provided' }}</p>
+            <p><strong>Total Amount:</strong> {{ order.totalPrice | currency }}</p>
+            <p><strong>Shipping Address:</strong> {{ order.shippingAddress }}</p>
+            <p><strong>Payment Method:</strong> {{ order.paymentMethod }}</p>
+            <p><strong>Created At:</strong> {{ order.createdAt | date:'medium' }}</p>
+          </div>
+
+          <div class="order-items">
+            <h3>Items:</h3>
+            <div class="item" *ngFor="let item of order.items">
+              <span>{{ item.product?.name || 'Unknown Product' }} (x{{ item.quantity }})</span>
+              <span>{{ item.price * item.quantity | currency }}</span>
+            </div>
+          </div>
+
+          <div class="order-actions">
+            <label for="status">Change Status:</label>
+            <select id="status" [value]="order.status" (change)="updateStatus(order._id, $event)">
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-orders" *ngIf="orders.length === 0">
+        <h2>No Orders Found</h2>
+        <p>Orders will appear here once customers place them.</p>
+        <button class="cta-button" (click)="navigateTo('products')">Manage Products</button>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!-- admin-user-list.component.html -->
+<div class="admin-container">
+    <header class="admin-header">
+      <h1>User Management</h1>
+      <div class="header-actions">
+        <div class="search-container">
+          <input type="text" placeholder="Search users..." class="search-input">
+          <i class="fa fa-search search-icon"></i>
+        </div>
+        <button class="add-user-btn">
+          <i class="fa fa-plus"></i> Add User
+        </button>
+      </div>
+    </header>
+  
+    <div class="filter-section">
+      <div class="filter-controls">
+        <div class="filter-item">
+          <label for="role-filter">Role:</label>
+          <select id="role-filter" class="filter-select">
+            <option value="all">All Roles</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="status-filter">Status:</label>
+          <select id="status-filter" class="filter-select">
+            <option value="all">All Status</option>
+          </select>
+        </div>
+      </div>
+      <div class="results-info">
+        Showing <span class="user-count">0</span> users
+      </div>
+    </div>
+  
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>
+              <div class="checkbox-container">
+                <input type="checkbox" id="select-all">
+                <label for="select-all"></label>
+              </div>
+            </th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>
+              <div class="checkbox-container">
+                <input type="checkbox" id="select-user-1">
+                <label for="select-user-1"></label>
+              </div>
+            </td>
+            <td>{{user.email}}</td>
+            <td>••••••••</td>
+            <td><span class="badge badge-admin">{{user.role}}</span></td>
+            <td class="actions-cell">
+                <button class="action-btn delete-btn" title="Delete User" (click)="deleteUser(user.email.toString())">
+                    <i class="fa fa-trash"></i> Delete
+                  </button>
+            </td>
+          </tr>
+        
+        </tbody>
+      </table>
+    </div>
+  </div>
